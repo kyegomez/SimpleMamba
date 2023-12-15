@@ -2,8 +2,33 @@ import torch
 from einops import rearrange
 from torch import einsum, nn
 
+
 # helpers
 class MambaBlock(nn.Module):
+    """MambaBlock
+
+    Args:
+        nn (_type_): _description_
+
+
+    Attributes:
+        dim (int): _description_
+        hidden_dim (int): _description_
+        heads (int): _description_
+        proj (nn.Linear): _description_
+        silu (nn.SiLU): _description_
+        conv (nn.Conv1d): _description_
+
+    Example:
+        >>> import torch
+        >>> from simple_mamba.main import MambaBlock
+        >>> mamba_block = MambaBlock(dim=512, hidden_dim=128, heads=8, in_channels=3, out_channels=3, kernel_size=3, stride=1)
+        >>> x = torch.randn(1, 3, 512)
+        >>> output = mamba_block(x)
+        >>> assert output.shape == x.shape
+
+    """
+
     def __init__(
         self,
         dim,
@@ -45,7 +70,7 @@ class MambaBlock(nn.Module):
         x = self.silu(x)
 
         # Apply ssm to x
-        x = ssm(x)
+        # x = ssm(x)
 
         # Mat mul with x_
         x = x @ x_.transpose(-1, -2)
@@ -59,56 +84,56 @@ class MambaBlock(nn.Module):
 # Transformer
 
 
-class Transformer(nn.Module):
-    def __init__(
-        self,
-        dim,
-        depth,
-        heads,
-        dim_head,
-        ff_mult=4,
-    ):
-        super().__init__()
-        self.layers = nn.ModuleList([])
+# class Transformer(nn.Module):
+#     def __init__(
+#         self,
+#         dim,
+#         depth,
+#         heads,
+#         dim_head,
+#         ff_mult=4,
+#     ):
+#         super().__init__()
+#         self.layers = nn.ModuleList([])
 
-        for _ in range(depth):
-            self.layers.append(
-                ParallelTransformerBlock(
-                    dim, dim_head, heads, ff_mult
-                ),
-            )
+#         for _ in range(depth):
+#             self.layers.append(
+#                 ParallelTransformerBlock(
+#                     dim, dim_head, heads, ff_mult
+#                 ),
+#             )
 
-    def forward(self, x):
-        for block in self.layers:
-            x = block(x) + x
-        return x
-
-
-# classes
+#     def forward(self, x):
+#         for block in self.layers:
+#             x = block(x) + x
+#         return x
 
 
-class BitNetTransformer(nn.Module):
-    def __init__(
-        self,
-        dim,
-        depth,
-        num_tokens,
-        dim_head=64,
-        heads=8,
-        ff_mult=4,
-    ):
-        super().__init__()
-        self.emb = nn.Embedding(num_tokens, dim)
+# # classes
 
-        self.transformer = Transformer(
-            dim, depth, heads, dim_head, ff_mult
-        )
 
-        self.to_logits = nn.Sequential(
-            RMSNorm(dim), nn.Linear(dim, num_tokens)
-        )
+# class BitNetTransformer(nn.Module):
+#     def __init__(
+#         self,
+#         dim,
+#         depth,
+#         num_tokens,
+#         dim_head=64,
+#         heads=8,
+#         ff_mult=4,
+#     ):
+#         super().__init__()
+#         self.emb = nn.Embedding(num_tokens, dim)
 
-    def forward(self, x):
-        x = self.emb(x)
-        x = self.transformer(x)
-        return self.to_logits(x)
+#         self.transformer = Transformer(
+#             dim, depth, heads, dim_head, ff_mult
+#         )
+
+#         self.to_logits = nn.Sequential(
+#             RMSNorm(dim), nn.Linear(dim, num_tokens)
+#         )
+
+#     def forward(self, x):
+#         x = self.emb(x)
+#         x = self.transformer(x)
+#         return self.to_logits(x)
