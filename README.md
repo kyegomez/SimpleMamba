@@ -9,7 +9,7 @@
 ## Usage
 ```python
 import torch
-from simple_mamba.two import MambaBlock
+from simple_mamba import MambaBlock
 
 
 # Define block parameters

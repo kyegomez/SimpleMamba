@@ -46,5 +46,3 @@ class MambaBlock(nn.Module):
         x = torch.matmul(x_proj, x_conv.transpose(-1, -2))
         x = self.proj(x)
         return x
-
-
