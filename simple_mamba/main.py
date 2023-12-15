@@ -36,6 +36,7 @@ class MambaBlock(nn.Module):
         heads,
         in_channels: int = None,
         out_channels: int = None,
+        kernel_size: int = None,
         *args,
         **kwargs,
     ):
@@ -43,6 +44,9 @@ class MambaBlock(nn.Module):
         self.dim = dim
         self.hidden_dim = hidden_dim
         self.heads = heads
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.kernel_size = kernel_size
 
         # Project to hidden dim
         self.proj = nn.Linear(dim, dim)
@@ -54,26 +58,31 @@ class MambaBlock(nn.Module):
         self.conv = nn.Conv1d(
             in_channels=in_channels,
             out_channels=out_channels,
+            kernel_size=3,
             *args,
             **kwargs,
         )
 
     def forward(self, x: torch.Tensor):
-        x, x_ = self.proj(x)
+        # ... [previous operations] ...
 
-        # Apply silu to
+        x = self.proj(x)
+        x_ = self.proj(x)
+
+        # Apply silu
         x_ = self.silu(x_)
 
-        # Apply conv1d to x
-        x = self.conv(x)
-
+        # Apply conv1d and silu to x
+        # x = self.conv(x)
         x = self.silu(x)
 
-        # Apply ssm to x
-        # x = ssm(x)
+        # Reshape x_ to match x for matrix multiplication
+        x_ = x_.view(
+            x.shape[0], x.shape[1], -1
+        )  # Reshape to [1, 3, 510]
 
-        # Mat mul with x_
-        x = x @ x_.transpose(-1, -2)
+        # Matrix multiplication
+        x = torch.matmul(x, x_.transpose(-1, -2))
 
         # Final Proj to dim
         x = self.proj(x)
