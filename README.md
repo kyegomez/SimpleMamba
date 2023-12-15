@@ -36,4 +36,15 @@ assert output.shape == x.shape
 MIT
 
 
+# Citation
+```bibtex
+@misc{gu2023mamba,
+    title={Mamba: Linear-Time Sequence Modeling with Selective State Spaces}, 
+    author={Albert Gu and Tri Dao},
+    year={2023},
+    eprint={2312.00752},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
+}
 
+```
