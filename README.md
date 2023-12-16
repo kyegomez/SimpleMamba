@@ -35,6 +35,31 @@ print("Output shape:", output.shape)
 
 ```
 
+### `SSM`
+```python
+import torch 
+from simple_mamba import SSM
+
+
+# # Example usage
+vocab_size = 10000  # Example vocabulary size
+embed_dim = 256  # Example embedding dimension
+state_dim = 512  # State dimension
+num_layers = 2  # Number of state-space layers
+
+model = SSM(vocab_size, embed_dim, state_dim, num_layers)
+
+# Example input (sequence of word indices)
+input_seq = torch.randint(
+     0, vocab_size, (32, 10)
+ )  # Batch size of 32, sequence length of 10
+
+ # Forward pass
+logits = model(input_seq)
+print(logits.shape)  # Should be [32, 10, vocab_size]
+
+```
+
 
 # License
 MIT

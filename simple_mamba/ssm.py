@@ -7,7 +7,17 @@ class SSM(nn.Module):
     """SSm is a state-space model for language modeling.
 
     Args:
-        nn (_type_): _description_
+        vocab_size (int): Size of the vocabulary.
+        dim (int): Dimensionality of the embedding.
+        state_dim (int): Dimensionality of the state.
+        depth (int): Number of state-space layers.
+
+    Examples:
+        >>> ssm = SSM(vocab_size=100, dim=50, state_dim=30, depth=2)
+        >>> input_tensor = torch.randint(100, (10,))
+        >>> output = ssm(input_tensor)
+        >>> output.shape
+        torch.Size([10, 100])
 
     """
 

@@ -38,6 +38,7 @@ class MambaBlock(nn.Module):
             padding=kernel_size // 2,
         )
 
+        # Now we can initialize the SSM
         self.ssm = SSM(
             vocab_size=vocab_size,
             dim=dim,
