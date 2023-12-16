@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+from simple_mamba.two import SSM
 
 
 class MambaBlock(nn.Module):
@@ -7,10 +8,15 @@ class MambaBlock(nn.Module):
         self,
         dim,
         hidden_dim,
+        vocab_size,
+        state_dim,
+        depth,
         heads,
         in_channels,
         out_channels,
         kernel_size,
+        *args,
+        **kwargs,
     ):
         super(MambaBlock, self).__init__()
         self.dim = dim
@@ -30,6 +36,14 @@ class MambaBlock(nn.Module):
             kernel_size=kernel_size,
             stride=1,
             padding=kernel_size // 2,
+        )
+
+        self.ssm = SSM(
+            vocab_size=vocab_size,
+            dim=dim,
+            state_dim=state_dim,
+            depth=depth,
+            *args,
         )
 
     def forward(self, x: torch.Tensor):
